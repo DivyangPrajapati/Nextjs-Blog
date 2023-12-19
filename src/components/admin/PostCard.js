@@ -26,13 +26,19 @@ function PostCard({ post }) {
           {post.title}
         </Link>
       </td>
+      <td className="border-b border-slate-200 p-4 w-52">
+        {post.categories &&
+          post.categories.map((category) => category.title).join(", ")}
+      </td>
       <td className="border-b border-slate-200 p-4">{post.author?.name}</td>
-      <td className="border-b border-slate-200 p-4 capitalize">{post.status}</td>
+      <td className="border-b border-slate-200 p-4 capitalize">
+        {post.status}
+      </td>
       <td className="border-b border-slate-200 p-4">
         {dateFormat(post.createdAt)}
       </td>
       <td className="border-b border-slate-200 p-4">
-      <Link target="_blank" className="text-cyan-400" href={`/${post.slug}/`}>
+        <Link target="_blank" className="text-cyan-400" href={`/${post.slug}/`}>
           View
         </Link>
         &nbsp;/&nbsp;

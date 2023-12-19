@@ -23,7 +23,15 @@ function PostCard({ post }) {
         <h2 className="text-2xl font-bold mb-4">
           <Link href={`/${post.slug}`}>{post.title}</Link>
         </h2>
-        <p className="mb-6">{getExcerpt(post.content)}</p>
+        <div className="mb-6">
+          <p className="mb-2">{getExcerpt(post.content)}</p>
+          {post.categories && (
+            <p className="text-sm">
+              <span className="font-bold">Categories:</span>{" "}
+              {post.categories.map((category) => category.title).join(", ")}
+            </p>
+          )}
+        </div>
         <p className="text-sm italic mb-10">{post.author?.name}</p>
       </div>
     </div>

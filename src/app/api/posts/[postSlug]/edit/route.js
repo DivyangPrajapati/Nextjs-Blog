@@ -19,6 +19,7 @@ export async function PUT(request, { params }) {
     const content = res.get('content');
     const status  = res.get('status');
     const file    = res.get('thumbnail');
+    const categories  = JSON.parse(res.get('categories'));
 
     if (!title || !content ) {
       return NextResponse.json(
@@ -29,7 +30,8 @@ export async function PUT(request, { params }) {
 
     let updatedPost = {
         title,
-        content
+        content,
+        categories: categories ? categories : null
       };
     
     if( status ) {

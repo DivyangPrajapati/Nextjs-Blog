@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AlertBox from "@/components/AlertBox";
 import GoBack from "@/components/admin/GoBack";
+import CategoryList from "@/components/admin/CategoryList";
 
 //import Image from 'next/image'
 
@@ -14,11 +15,25 @@ export default function CreatePost() {
     content: "",
     file: "",
     author: "650d58af5b1818ca118ce2af",
+    selectedCategories: [],
     status: "published",
   });
-  
+
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const getCategories = async () => {
+      const res = await fetch(`/api/posts/categories`);
+
+      const data = await res.json();
+
+      setCategories(data.categories);
+    };
+
+    getCategories();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +49,23 @@ export default function CreatePost() {
       ...inputData,
       file,
     });
-  }
+  };
+
+  const handleCheckboxChange = (categoryId) => {
+    if (inputData.selectedCategories.includes(categoryId)) {
+      setInputData({
+        ...inputData,
+        selectedCategories: inputData.selectedCategories.filter(
+          (id) => id !== categoryId
+        )
+      });
+    } else {
+      setInputData({
+        ...inputData,
+        selectedCategories: [...inputData.selectedCategories, categoryId],
+      });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,12 +84,13 @@ export default function CreatePost() {
         }),
       }); */
       const formData = new FormData();
-      formData.append('title', inputData.title);
-      formData.append('content', inputData.content);
-      formData.append('status', inputData.status);
-      formData.append('author', inputData.author);
-      formData.append('thumbnail', inputData.file);
-      
+      formData.append("title", inputData.title);
+      formData.append("content", inputData.content);
+      formData.append("status", inputData.status);
+      formData.append("author", inputData.author);
+      formData.append("thumbnail", inputData.file);
+      formData.append("categories", JSON.stringify(inputData.selectedCategories));
+
       const res = await fetch(`/api/posts/create`, {
         method: "POST",
         body: formData,
@@ -82,7 +114,8 @@ export default function CreatePost() {
         title: "",
         content: "",
         file: "",
-        author: "650d58af5b1818ca118ce2af", 
+        author: "650d58af5b1818ca118ce2af",
+        selectedCategories: [],
         status: "published",
       });
 
@@ -93,9 +126,19 @@ export default function CreatePost() {
   return (
     <>
       <h2 className="text-3xl font-bold mb-10">Create Post</h2>
-      
-      {status === "success" && <AlertBox status="success" message="Post successfully created!"></AlertBox>}
-      {status === "error" && <AlertBox status="error" message="There was an error creating the post. Please try again later."></AlertBox>}
+
+      {status === "success" && (
+        <AlertBox
+          status="success"
+          message="Post successfully created!"
+        ></AlertBox>
+      )}
+      {status === "error" && (
+        <AlertBox
+          status="error"
+          message="There was an error creating the post. Please try again later."
+        ></AlertBox>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
@@ -130,8 +173,30 @@ export default function CreatePost() {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="thumbnail" className="block mb-2 text-sm font-medium">Upload Image</label>
-          <input type="file" name="thumbnail" id="thumbnail" onChange={handleThumbnailChanged} />
+          <label htmlFor="thumbnail" className="block mb-2 text-sm font-medium">
+            Upload Image
+          </label>
+          <input
+            type="file"
+            name="thumbnail"
+            id="thumbnail"
+            onChange={handleThumbnailChanged}
+          />
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="categories"
+            className="block mb-2 text-sm font-medium"
+          >
+            Categories
+          </label>
+
+          <CategoryList
+            categories={categories}
+            selectedCategories={inputData.selectedCategories}
+            onCheckboxChange={handleCheckboxChange}
+          />
         </div>
 
         <div className="mb-6">

@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
 
     //const post = await Post.findOne({slug: params.postSlug}).populate('author', 'name');
     //const post = await Post.findOne({slug: params.postSlug}).populate('author', ['name', email]);
-    const post = await Post.findOne({slug: params.postSlug}).populate('author', '-password');
+    const post = await Post.findOne({slug: params.postSlug}).populate('author', '-password').populate('categories');
 
     if( !post ) {
       return NextResponse.json({ success: false, message: 'Post not found' }, { status: 404 });

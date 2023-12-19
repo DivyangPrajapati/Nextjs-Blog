@@ -22,7 +22,10 @@ const postSchema = new Schema(
       required: true,
     },
     //comments: [{ body: String, date: Date }],
-    categories: [String],
+    categories: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category'
+    }],
     tags: [String],
     thumbnail: String,
     status: {

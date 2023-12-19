@@ -36,6 +36,9 @@ export default async function Posts() {
                 Title
               </th>
               <th className="border-t border-b-2 border-slate-200 p-4 text-left">
+                Categories
+              </th>
+              <th className="border-t border-b-2 border-slate-200 p-4 text-left">
                 Author
               </th>
               <th className="border-t border-b-2 border-slate-200 p-4 text-left">

@@ -6,6 +6,7 @@ import AlertBox from "@/components/AlertBox";
 import { notFound } from "next/navigation";
 import GoBack from "@/components/admin/GoBack";
 import Image from "next/image";
+import CategoryList from "@/components/admin/CategoryList";
 
 //import Image from 'next/image'
 
@@ -15,15 +16,27 @@ export default function EditPost({ params }) {
     title: "",
     content: "",
     file: "",
+    selectedCategories: "",
     status: "published",
   });
 
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [previewImg, setPreviewImg] = useState("");
   const [noData, setNoData] = useState(false);
 
   useEffect(() => {
+    const getCategories = async () => {
+      const res = await fetch(`/api/posts/categories`);
+
+      const data = await res.json();
+
+      setCategories(data.categories);
+    };
+
+    getCategories();
+
     const getPost = async () => {
       const res = await fetch(`/api/posts/${params.postSlug}`);
 
@@ -38,6 +51,7 @@ export default function EditPost({ params }) {
         title: data.title,
         content: data.content,
         file: "",
+        selectedCategories: data.categories ? data.categories.map((category) => category._id) : [],
         status: data.status,
       });
 
@@ -68,6 +82,22 @@ export default function EditPost({ params }) {
       file,
     });
   };
+  
+  const handleCheckboxChange = (categoryId) => {
+    if (inputData.selectedCategories.includes(categoryId)) {
+      setInputData({
+        ...inputData,
+        selectedCategories: inputData.selectedCategories.filter(
+          (id) => id !== categoryId
+        )
+      });
+    } else {
+      setInputData({
+        ...inputData,
+        selectedCategories: [...inputData.selectedCategories, categoryId],
+      });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,6 +120,7 @@ export default function EditPost({ params }) {
       formData.append("content", inputData.content);
       formData.append("status", inputData.status);
       formData.append("thumbnail", inputData.file);
+      formData.append("categories", JSON.stringify(inputData.selectedCategories));
 
       const res = await fetch(`/api/posts/${params.postSlug}/edit`, {
         method: "PUT",
@@ -191,6 +222,21 @@ export default function EditPost({ params }) {
               />
             </div>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="categories"
+            className="block mb-2 text-sm font-medium"
+          >
+            Categories
+          </label>
+
+          <CategoryList
+            categories={categories}
+            selectedCategories={inputData.selectedCategories}
+            onCheckboxChange={handleCheckboxChange}
+          />
         </div>
 
         <div className="mb-6">

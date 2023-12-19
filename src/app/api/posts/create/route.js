@@ -25,11 +25,12 @@ export async function POST(request) {
     const author = user.id;
 
     const res = await request.formData();
-    const title   = res.get('title');
-    const content = res.get('content');
-    const status  = res.get('status');
-    // const author  = res.get('author');
-    const file    = res.get('thumbnail');
+    const title       = res.get('title');
+    const content     = res.get('content');
+    const status      = res.get('status');
+    // const author   = res.get('author');
+    const file        = res.get('thumbnail');
+    const categories  = JSON.parse(res.get('categories'));
 
     if (!title || !content || !author ) {
       return NextResponse.json(
@@ -68,7 +69,8 @@ export async function POST(request) {
       slug,
       author,
       status,
-      thumbnail
+      thumbnail,
+      categories: categories ? categories : null
     });
 
     const post = await newPost.save();
